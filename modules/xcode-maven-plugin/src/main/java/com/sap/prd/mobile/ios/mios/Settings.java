@@ -32,8 +32,8 @@ final class Settings implements ISettings
   enum ManagedSetting
   {
     CODE_SIGN_IDENTITY(false, null), CODE_SIGNING_REQUIRED(false, null), PROVISIONING_PROFILE(false, null), 
-          DSTROOT(false, XCODE_OUTPUT_DIRECTORY), SYMROOT(false, XCODE_OUTPUT_DIRECTORY), SHARED_PRECOMPS_DIR(false, 
-          XCODE_OUTPUT_DIRECTORY), OBJROOT(false, XCODE_OUTPUT_DIRECTORY);
+          DSTROOT(true, XCODE_OUTPUT_DIRECTORY), SYMROOT(true, XCODE_OUTPUT_DIRECTORY), SHARED_PRECOMPS_DIR(true, 
+          XCODE_OUTPUT_DIRECTORY), OBJROOT(true, XCODE_OUTPUT_DIRECTORY);
 
     private final boolean required;
     private String defaultValue;

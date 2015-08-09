@@ -67,10 +67,10 @@ public abstract class BuildContextAwareMojo extends AbstractXCodeMojo
    * developer provisioning certificate is available (e.g.
    * <code>NO</code>, <code>YES</code>).
    * 
-   * @parameter expression="${xcode.codeSigningRequired}"
+   * @parameter expression="${xcode.codeSigningRequired}" default-value = "true"
    * @since 1.14.1
    */
-  protected String codeSigningRequired;
+  protected boolean codeSigningRequired;
   
   /**
    * Can be used to override the provisioning profile defined in the Xcode project target. You can
@@ -140,15 +140,13 @@ public abstract class BuildContextAwareMojo extends AbstractXCodeMojo
     if (codeSignIdentity != null)
       managedSettings.put(Settings.ManagedSetting.CODE_SIGN_IDENTITY.name(), codeSignIdentity);
 
-    if (codeSigningRequired != null && !codeSigningRequired.trim().isEmpty())
-      managedSettings.put(Settings.ManagedSetting.CODE_SIGNING_REQUIRED.name(), codeSigningRequired);
+    if (!codeSigningRequired)
+      managedSettings.put(Settings.ManagedSetting.CODE_SIGNING_REQUIRED.name(), "NO");
 
     if (provisioningProfile != null)
       managedSettings.put(Settings.ManagedSetting.PROVISIONING_PROFILE.name(), provisioningProfile);
 
     HashMap<String, String> managedOptions = new HashMap<String, String>();
-
-    managedOptions.put(Options.ManagedOption.PROJECT.getOptionName(), projectName + ".xcodeproj");
 
     if (configuration != null && !configuration.trim().isEmpty())
       managedOptions.put(Options.ManagedOption.CONFIGURATION.getOptionName(), configuration);
@@ -170,6 +168,10 @@ public abstract class BuildContextAwareMojo extends AbstractXCodeMojo
     for (String key : getKeys(PREFIX_XCODE_OPTIONS)) {
       _options.put(key.substring(PREFIX_XCODE_OPTIONS.length()), getProperty(key));
     }
+
+    if (null == _options.get("scheme"))
+    managedOptions.put(Options.ManagedOption.PROJECT.getOptionName(), projectName + ".xcodeproj");
+
 
     return new XCodeContext(getBuildActions(), projectDirectory, System.out, new Settings(_settings, managedSettings),
           new Options(_options, managedOptions));

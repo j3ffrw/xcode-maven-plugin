@@ -31,7 +31,9 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.regex.Matcher;
@@ -44,7 +46,7 @@ import org.apache.maven.it.Verifier;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-public class StraightForwardLibAndAppTest extends XCodeTest
+public class StraightForwardLibAndAppWithoutSigningTest extends XCodeTest
 {
   private static File remoteRepositoryDirectory = null, appTestBaseDir = null;
   private static String dynamicVersion = null,
@@ -64,10 +66,10 @@ public class StraightForwardLibAndAppTest extends XCodeTest
     dynamicVersion = "1.0." + String.valueOf(System.currentTimeMillis());
     myLibArtifactFilePrefix = TestConstants.GROUP_ID_WITH_SLASH + "/MyLibrary/" + dynamicVersion + "/MyLibrary-"
           + dynamicVersion;
-    testName = StraightForwardLibAndAppTest.class.getName() + File.separator
+    testName = StraightForwardLibAndAppWithoutSigningTest.class.getName() + File.separator
           + Thread.currentThread().getStackTrace()[1].getMethodName();
 
-    remoteRepositoryDirectory = getRemoteRepositoryDirectory(StraightForwardLibAndAppTest.class.getName());
+    remoteRepositoryDirectory = getRemoteRepositoryDirectory(StraightForwardLibAndAppWithoutSigningTest.class.getName());
 
     prepareRemoteRepository(remoteRepositoryDirectory);
 
@@ -85,9 +87,13 @@ public class StraightForwardLibAndAppTest extends XCodeTest
     test(testName, new File(getTestRootDirectory(), "straight-forward/MyLibrary"), "deploy",
           THE_EMPTY_LIST, THE_EMPTY_MAP, pomReplacements, new NullProjectModifier());
 
+    List<String> commandLineArgs = new ArrayList<String>();
+    commandLineArgs.add("-Dxcode.codeSigningRequired=false");
+    commandLineArgs.add("-Dxcode.codeSignIdentity=\"\"");
+    
     appVerifier = test(testName, new File(getTestRootDirectory(), "straight-forward/MyApp"),
           "deploy",
-          THE_EMPTY_LIST,
+          commandLineArgs,
           additionalSystemProperties, pomReplacements, new NullProjectModifier());
 
     myAppVersionRepoDir = TestConstants.GROUP_ID_WITH_SLASH + "/MyApp/" + dynamicVersion;
@@ -262,7 +268,7 @@ public class StraightForwardLibAndAppTest extends XCodeTest
       assertTrue(
             "OTA HTML location has not been written into OTA archive HTML file",
             otaArchiveHtmlContent
-              .contains("target/remoteRepo/com.sap.prd.mobile.ios.mios.StraightForwardLibAndAppTest/com/sap/ondevice/production/ios/tests/MyApp/"
+              .contains("target/remoteRepo/com.sap.prd.mobile.ios.mios.StraightForwardLibAndAppWithoutSigningTest/com/sap/ondevice/production/ios/tests/MyApp/"
                     + dynamicVersion + "/MyApp-" + dynamicVersion + "-Release-iphoneos-ota.htm"));
     }
     finally {
